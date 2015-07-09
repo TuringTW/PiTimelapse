@@ -74,7 +74,7 @@ def deletefile(num):
 	global photo
 	try:
 		filename = photo[num]
-		os.remove('phototemp/'+filename)
+		os.remove('phototemp/'+filename+'.jpg')
 	except OSError:
 	    pass
 
