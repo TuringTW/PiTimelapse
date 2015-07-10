@@ -14,7 +14,7 @@ interval = interval - 4.0/60;
 
 photo = [];
 def googleauth():
-	global auth
+	global gauth
 	gauth.LocalWebserverAuth() # Creates local webserver and auto handles authentication
 
 	pass
