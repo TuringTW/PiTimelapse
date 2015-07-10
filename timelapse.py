@@ -6,26 +6,32 @@ import urllib2
 import os
 
 gauth = GoogleAuth()
-gauth.LocalWebserverAuth() # Creates local webserver and auto handles authentication
 
 # config
-interval = 2
+interval = 0.5
+
+interval = interval - 4.0/60;
 
 photo = [];
+def googleauth():
+	global auth
+	gauth.LocalWebserverAuth() # Creates local webserver and auto handles authentication
 
+	pass
 def takepicture():
 	global photo
 	with picamera.PiCamera() as camera:
-		filename = 'Pipy_'+timestamp()
-		# camera.start_preview()
+		
+		camera.start_preview()
 		# Camera warm-up time
-		time.sleep(1)
+		time.sleep(2)
 		camera.resolution = (2592, 1944)
-		camera.iso = 0
+		camera.iso = 200
 		camera.exposure_mode = 'auto'
 		g = camera.awb_gains
 		camera.awb_mode = 'auto'
 		camera.awb_gains = g
+		filename = 'Pipy_'+timestamp()
 		camera.capture('./phototemp/'+filename+'.jpg')
 		photo.append(filename)
 		print "capture!!!"
@@ -34,19 +40,20 @@ def checkupload(num):
 	global gauth, photo
 	drive = GoogleDrive(gauth)
 	if networkcheck():
-		try:
-			filename = photo[num]
-			file_list = drive.ListFile({'q': "title='"+filename+".jpg'"}).GetList()
-			for file1 in file_list:
-					print 'title: %s, id: %s' % (file1['title'], file1['id'])
-			if len(file_list)!=0:
-				deletefile(num)
-				photo.pop(num)
-				print "upload checked"
-				pass
-		except:
-			print 'fail to  check upload state'
-		pass
+		# try:
+		filename = photo[num]
+		file_list = drive.ListFile({'q': "title='"+filename+".jpg'"}).GetList()
+		for file1 in file_list:
+				print 'title: %s, id: %s' % (file1['title'], file1['id'])
+		if len(file_list)!=0:
+			deletefile(num)
+			photo.pop(num)
+			print "upload checked"
+			pass
+		# except:
+			# print 'fail to  check upload state'
+			# googleauth();
+		# pass
 	pass
 def uploadfile(num):
 	global gauth, photo
@@ -85,9 +92,11 @@ def getmin():
 	pass
 def timestamp():
 	t = time.time()
-	return time.strftime('%Y-%m-%d %H:%M:00', time.localtime(t))
+	return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(t))
 	pass
 
+
+googleauth();
 premin = 0;
 while 1:
 	if getmin()-premin>interval:
@@ -103,7 +112,7 @@ while 1:
 	else:
 		value = 100*round((getmin()-premin)/interval,2)
 		print('waiting...'+str(value)+'%')
-		time.sleep(5)	
+		time.sleep(1)	
 		pass
 # upload
 
